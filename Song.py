@@ -184,6 +184,6 @@ class Song:
         if file_name:
             with open(file_name + '.ly', 'w') as f:
                 f.write(staff)
-            print('[Alert]: Staff written to ' + file_name + '.ly')
+            print('Staff written to ' + file_name + '.ly')
 
         return staff
