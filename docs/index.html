@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>tablatar</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="divided">
+
+				<!-- Head -->
+					<section class="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
+						<div class="content">
+							<h1>tablatar</h1>
+							<p class="major">tablatar turns your monophonic guitar music into easy-to-play tablature.</p>
+							<ul class="actions stacked">
+								<li><a href="#background" class="button big wide smooth-scroll-middle">learn more</a></li>
+							</ul>
+						</div>
+						<div class="image">
+							<img src="images/big_guitar.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Background -->
+					<section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="background">
+						<div class="content">
+							<h2>Background</h2>
+							<p>Guitar tablature allows musicians who cannot read sheet music to learn how to play new songs. Tablature mimics the guitar's fretboard, providing exact fret and string information to the player.</p>
+						</div>
+						<div class="image">
+							<img src="images/staff_and_tab.png" alt="" />
+						</div>
+					</section>
+
+				<!-- Current Methods -->
+					<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+						<div class="content">
+							<h2>Current Methods</h2>
+							<p>
+								Users who want to learn a new song have two primary options:
+								<br>
+								<b>Manual transcription:</b> often time-consuming, with high risk of human error. Requires prior music knowledge, or prior work done by someone else on sites like <a href="https://ultimate-guitar.com">UltimateGuitar.</a>
+								<br>
+								<b>Automatic transcription:</b> sites like <a href="https://chordify.net">Chordify</a> can automatically extract chords from a song, but this is limited to the backbone of the song rather than the melody.
+							</p>
+						</div>
+						<div class="image">
+							<img src="images/composing.jpg" alt="" />
+						</div>
+					</section>
+
+				<!-- Approach -->
+					<section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
+						<div class="content">
+							<h2>Approach</h2>
+							<p>
+								We extract notes from a recording, then apply one of three heuristics to choose which possible fretting of a note is <i>most-playable</i> in the context of the song.
+							</p>
+						</div>
+						<div class="image fit" style="margin-left: 15px; margin-top: 1px">
+							<img src="images/approach.png" alt="" />
+						</div>
+					</section>
+
+				<!-- Proposed Method -->
+					<section>
+						<div class="content" style="margin: 25px">
+							<h2 style="padding-top: 10px">Our Method</h2>
+							<p>
+								<span class="image fit"><img src="images/method.jpg" alt="" /></span>
+								&nbsp;&nbsp;&nbsp;&nbsp;We extract “chunks” of notes, divided based on a configurable onset difference. We iterate through all notes in each chunk. For each note, the fretting option is chosen that is closest to a “target fret,” chosen based on a heuristic measure. Our current best heuristic is <code>average_k</code>, which chooses a target fret closest to the average <code>k</code> previous frets, while preferring open-string options. The <code>open_previous</code> heuristic chooses a target fret closest to the immediately previous note (essentially <code>average_k</code> with <code>k=1</code>), while again preferring open-string options. This heuristic is applied at notes index less than <code>(k-1)</code> for <code>average_k</code>—that is, notes where <code>average_k</code> is impossible. Finally, the previous heuristic chooses a target fret based solely on the previous note’s fret.
+								<br>
+								&nbsp;&nbsp;&nbsp;&nbsp;When considering the first note of a chunk’s mapping, we consider all possibilities (as all future notes will rely on that choice), and generate mappings for that chunk for each option. We finally choose the chunk mapping by selecting the mapping with the minimum distance traveled by fret. Finally, all chunk mappings are combined and processed into text that can be typeset by LilyPond.
+							</p>
+						</div>
+					</section>
+
+				<!-- Try it -->
+					<section>
+						<div class="content">
+							<div class="content" style="margin: 25px">
+							<h2 style="padding-top: 10px">Example</h2>
+							<figure style="text-align: center;">
+							    <figcaption>Original Recording</figcaption>
+							    <audio
+							        controls
+							        src="clean_01.mp3">
+							            Your browser does not support the
+							            <code>audio</code> element.
+							    </audio>
+							</figure>
+							<p style="text-align: center">
+								<br>
+								Program output:
+								<br>
+								<code>
+									%['G2', 'A2', 'B2', 'A2', 'G2', 'A2', 'G2']
+									<br>
+									\new TabStaff { g,\6 a,\5 b,\5 a,\5 g,\6 a,\5 g,\6 }
+								</code>
+								<br>
+								<br>
+								After typesetting in LilyPond:
+								<span class="image fit"><img src="images/clean_01.png" alt="" /></span>
+							</p>
+						</div>
+					</section>
+
+				<!-- Results -->
+					<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+						<div class="content">
+							<h2>Results</h2>
+							<p>
+								&nbsp;&nbsp;&nbsp;&nbsp;We tested on a self-recorded dataset of 50 moderate-speed and monophonic melodies, played line-in on an electric guitar. The accuracy of the notes detected from the original recordings is displayed in the histogram to the right.
+								<br>
+								&nbsp;&nbsp;&nbsp;&nbsp;Our method was also tested qualitatively. We gave the tablature produced from the dataset by tablatar to beginning guitarists. We found that all results were technically playable, although there was a varying degree of difficulty&mdash;primarily stemming from the original recording, not our output.
+							</p>
+						</div>
+						<div class="image" style="margin-top: 1px;">
+							<img src="images/results.png" alt=""/>
+						</div>
+					</section>
+
+				<!-- Conclusions -->
+					<section class="wrapper style1 align-left">
+						<div class="inner">
+							<h2>Conclusions</h2>
+							<p>
+								&nbsp;&nbsp;&nbsp;&nbsp;Our results indicate that onset accuracy is one of the most important factors in generating notes. While pitch tracking generally worked as expected, as is visible in the above histogram there were cases of missed onsets. Additionally, we learned that there is no good "ground truth" when comparing tablature, as a sequence of notes can be played in multiple ways. This meant that we needed to subjective measures to evaluate our method.
+								<br>
+								&nbsp;&nbsp;&nbsp;&nbsp;In general, we found that our <code>open_previous</code> method worked best on this data set, as there frequently were not enough notes to generate a useful average. In longer recordings, however, <code>average_k</code> will do a better job of producing playable tablature.
+								<br>
+								<br>
+								<b>Limitations</b>
+								<br>
+								&nbsp;&nbsp;&nbsp;&nbsp;As mentioned, accurate onset detection is difficult when relying on pre-existing libraries. This limited our ability to correctly identify all notes played in our data set. We also found that the correctness of the result varies with the quality and speed of recordings. If the track analyzed is distorted or transitions between notes too quickly, the onset detection and pitch tracking suffers.
+								<br>
+								<br>
+								<b>Future Work</b>
+								<br>
+								&nbsp;&nbsp;&nbsp;&nbsp;One path towards improving the accuracy of onset detection and pitch tracking would be through a machine learning approach. This would be a great next step forward. In order to improve the overall playability of our generated tablature, a more sophisticated fret-mapping algorithm could be created that attempted to maximize the existence of common chord shapes in the output tablature. This would work towards matching the way human players choose the best way to perform a song. Finally, support for multiphonic and more complex melodies would greatly increase the value of our platform, but obviously is a serious challenge as it is a subject of ongoing academic research.
+							</p>
+						</div>
+					</section>
+
+				<!-- Footer -->
+					<footer class="wrapper style1 align-center">
+						<div class="inner">
+							<p>tablatar was built by Kevin Chan, <a href="https://bdscharf.github.io">Benjamin Scharf</a>, and Renee Zha</p>
+							<div class="inner medium" style="margin-bottom: 10px">
+								<a href="https://github.com/bdscharf/tablatar" class="button">source</a>
+								<a href="Poster.pdf" download class="button">download poster</a>
+							</div>
+							<div class="inner medium" style="margin-top: 30px">
+								<p>tablatar leverages the following:</p>
+								<a href="https://librosa.github.io/" class="button">librosa</a>
+								<a href="https://aubio.org/" class="button">aubio</a>
+								<br>
+								<br>
+								<p>a long-term maintenance version of this project will be hosted <a href="https://github.com/bdscharf/tablatar">here</a></p>
+							</div>
+						</div>
+						<section>
+							<p>website design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+						</section>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
